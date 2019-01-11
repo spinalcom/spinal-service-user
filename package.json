@@ -1,0 +1,27 @@
+{
+  "name": "spinal-service-user",
+  "version": "1.0.0",
+  "description": "SpinalCOM service user. This service allow the management of users inside a spinal environment.",
+  "main": "dist/index.js",
+  "scripts": {
+
+  },
+  "keywords": [],
+  "author": "SPINALCOM",
+  "license": "SPINALCOM",
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "jsdoc-to-markdown": "^4.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.2.2",
+    "nyc": "^13.1.0",
+    "chai": "^4.2.0",
+    "@types/node": "^10.12.12"
+  },
+  "dependencies": {
+    "spinal-env-viewer-graph-service": "file:../spinal-env-viewer-graph-service",
+    "spinal-models-user": "git+https://github.com/spinalcom/spinal-models-user.git",
+    "spinal-core-connectorjs_type": "git+https://github.com/spinalcom/spinal-core-connectorjs_type.git"
+  }
+}
