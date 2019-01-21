@@ -23,7 +23,7 @@
  */
 import { SPINAL_RELATION_TYPE } from 'spinal-env-viewer-graph-service';
 
-export const SERVICE_NAME: string = 'UserService';
+export const SERVICE_NAME: string = '.UserService';
 export const SERVICE_TYPE: string = 'SpinalSystemServiceUser';
 export const RELATION_NAME: string = 'hasUser';
 export const RELATION_TYPE: string = SPINAL_RELATION_TYPE;

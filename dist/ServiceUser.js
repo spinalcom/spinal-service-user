@@ -23,7 +23,7 @@
  */
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty( exports, "__esModule", { value: true } );
 /*
  * Copyright 2019 SpinalCom - www.spinalcom.com
  *
@@ -47,48 +47,50 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *  with this file. If not, see
  *  <http://resources.spinalcom.com/licenses.pdf>.
  */
-const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
-const Constants_1 = require("./Constants");
-const Errors_1 = require("./Errors");
+const spinal_env_viewer_graph_service_1 = require( "spinal-env-viewer-graph-service" );
+const Constants_1 = require( "./Constants" );
+const Errors_1 = require( "./Errors" );
 const gRoot = typeof window === 'undefined' ? global : window;
+
 class ServiceUser {
   constructor() {
     this.initialized = false;
   }
-    createContext() {
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext(Constants_1.SERVICE_NAME, Constants_1.SERVICE_TYPE, undefined)
-            .then((context) => {
-            this.context = context;
-            this.contextId = context.info.id.get();
-        })
-            .catch((e) => {
-            console.error(e);
-            return Promise.reject(Error(Errors_1.CANNOT_CREATE_CONTEXT_INTERNAL_ERROR));
-        });
+  
+  createContext() {
+    return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext( Constants_1.SERVICE_NAME, Constants_1.SERVICE_TYPE, undefined )
+      .then( ( context ) => {
+        this.context = context;
+        this.contextId = context.info.id.get();
+      } )
+      .catch( ( e ) => {
+        console.error( e );
+        return Promise.reject( Error( Errors_1.CANNOT_CREATE_CONTEXT_INTERNAL_ERROR ) );
+      } );
+  }
+  
+  init() {
+    this.context = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext( Constants_1.SERVICE_NAME );
+    this.users = new Set();
+    this.initialized = true;
+    if (typeof this.context !== 'undefined') {
+      this.contextId = this.context.info.id.get();
+      spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren( this.contextId, [Constants_1.RELATION_NAME] )
+        .then( ( children ) => {
+          for (let i = 0; i < children.length; i = i + 1) {
+            this.users.add( children[i].id );
+          }
+        } )
+        .catch( ( e ) => {
+          console.error( e );
+        } );
+    } else {
+      this.createContext()
+        .catch( ( e ) => {
+          throw new Error( e );
+        } );
     }
-    init() {
-        this.context = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(Constants_1.SERVICE_NAME);
-      this.users = new Set();
-      this.initialized = true;
-        if (typeof this.context !== 'undefined') {
-            this.contextId = this.context.info.id.get();
-          spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren( this.contextId, [Constants_1.RELATION_NAME] )
-            .then( ( children ) => {
-              for (let i = 0; i < children.length; i = i + 1) {
-                this.users.add( children[i].id );
-              }
-            } )
-            .catch( ( e ) => {
-              console.error( e );
-            } );
-        }
-        else {
-            this.createContext()
-                .catch((e) => {
-                throw new Error(e);
-            });
-        }
-    }
+  }
   
   createUser( url, user ) {
     return this.findEmail( user.email )
@@ -105,11 +107,11 @@ class ServiceUser {
       .catch( ( e ) => {
         return Promise.resolve( e );
       } );
-        // @ts-ignore
+    // @ts-ignore
   }
   
   getUser( url, email, password ) {
-        // @ts-ignore
+    // @ts-ignore
     return this.findUserWithEmailPassword( email, password );
   }
   
@@ -119,18 +121,18 @@ class ServiceUser {
   
   findEmail( email ) {
     return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren( this.contextId, [Constants_1.RELATION_NAME] )
-            .then((children) => {
-            if (children.length < 0) {
-              return Promise.resolve( false );
-            }
-            for (let i = 0; i < children.length; i = i + 1) {
-              if (children[i].hasOwnProperty( 'email' )
-                && children[i].email.get() === email) {
-                return Promise.resolve( true );
-                }
-            }
-              return Promise.resolve( false );
-        });
+      .then( ( children ) => {
+        if (children.length < 0) {
+          return Promise.resolve( false );
+        }
+        for (let i = 0; i < children.length; i = i + 1) {
+          if (children[i].hasOwnProperty( 'email' )
+            && children[i].email.get() === email) {
+            return Promise.resolve( true );
+          }
+        }
+        return Promise.resolve( false );
+      } );
   }
   
   findUserWithEmailPassword( email, password ) {
@@ -154,5 +156,6 @@ class ServiceUser {
       }) );
   }
 }
+
 exports.ServiceUser = ServiceUser;
 //# sourceMappingURL=ServiceUser.js.map
