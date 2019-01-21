@@ -27,8 +27,8 @@ import { UserInterface } from 'spinal-models-user/declarations/SpinalUser';
 export declare class ServiceUser {
     contextId: string;
     private context;
-    private users;
   initialized: boolean;
+  private users;
     private createContext;
     init(): void;
 

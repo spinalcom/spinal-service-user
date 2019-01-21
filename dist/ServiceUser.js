@@ -113,6 +113,10 @@ class ServiceUser {
     return this.findUserWithEmailPassword( email, password );
   }
   
+  addNode( userId, childId, relationName, relationType ) {
+    return spinal_env_viewer_graph_service_1.SpinalGraphService.addChild( userId, childId, relationName, relationType );
+  }
+  
   findEmail( email ) {
     return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren( this.contextId, [Constants_1.RELATION_NAME] )
             .then((children) => {
@@ -148,10 +152,6 @@ class ServiceUser {
         console.error( e );
         return Promise.resolve( e );
       }) );
-  }
-  
-  addNode( userId, childId, relationName, relationType ) {
-    return spinal_env_viewer_graph_service_1.SpinalGraphService.addChild( userId, childId, relationName, relationType );
   }
 }
 exports.ServiceUser = ServiceUser;
