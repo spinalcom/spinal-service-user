@@ -28,7 +28,12 @@ import {
   SERVICE_NAME,
   SERVICE_TYPE,
 } from './Constants';
-import { CANNOT_CREATE_CONTEXT_INTERNAL_ERROR, USER_NOT_FOUND } from './Errors';
+import {
+  CANNOT_CREATE_CONTEXT_INTERNAL_ERROR,
+  USER_ALREADY_EXIST,
+  USER_BASE_EMPTY,
+  USER_NOT_FOUND,
+} from './Errors';
 import { UserInterface } from 'spinal-models-user/declarations/SpinalUser';
 
 const gRoot = typeof window === 'undefined' ? global : window;
@@ -36,7 +41,8 @@ const gRoot = typeof window === 'undefined' ? global : window;
 export class ServiceUser {
   public contextId: string;
   private context: any;
-  private users: Map<string, string>;
+  public initialized = false;
+  private users: Set<string>;
 
   private createContext(): Promise<any | Error> {
     return SpinalGraphService.addContext(SERVICE_NAME, SERVICE_TYPE, undefined)
@@ -49,10 +55,24 @@ export class ServiceUser {
         return Promise.reject(Error(CANNOT_CREATE_CONTEXT_INTERNAL_ERROR));
       });
   }
+
   public init() {
     this.context = SpinalGraphService.getContext(SERVICE_NAME);
+    this.users = new Set();
+    this.initialized = true;
     if (typeof this.context !== 'undefined') {
       this.contextId = this.context.info.id.get();
+      SpinalGraphService.getChildren(this.contextId, [RELATION_NAME])
+        .then((children) => {
+          for (let i = 0; i < children.length; i = i + 1) {
+
+            this.users.add(children[i].id);
+          }
+        })
+        .catch((e) => {
+          console.error(e);
+        })
+      ;
     } else {
       this.createContext()
         .catch((e) => {
@@ -60,66 +80,86 @@ export class ServiceUser {
         });
     }
   }
-  public createUser(user: UserInterface): Promise<boolean> {
-    // @ts-ignore
-    return gRoot.SpinalUserManager
-      .new_account(
-        {},
-        user.email,
-        user.password,
-        (res) => {
-          const id = parseInt(res);
-          if (id !== -1) {
 
-            const userId = SpinalGraphService
-              .createNode(user, undefined);
-            SpinalGraphService.modifyNode(userId, { userId: id });
-            SpinalGraphService
-              .addChildInContext(
-                this.contextId,
-                userId,
-                this.contextId,
-                RELATION_NAME,
-                RELATION_TYPE);
-            return true;
-          }
-          return false;
-        });
-  }
+  public createUser(url: any, user: UserInterface): Promise<UserInterface | string> {
 
-  public getUser(email, password): Promise<UserInterface> {
-    const url = '';
-    // @ts-ignore
-    return gRoot.SpinalUserManager.get_user_id(
-      url,
-      email,
-      password,
-      (response) => {
-        const id = parseInt(response);
-        if (id === -1) {
-          return false;
+    return this.findEmail(user.email)
+      .then((exist) => {
+        if (exist) {
+          return Promise.resolve(USER_ALREADY_EXIST);
         }
-        return this.findUser(id);
-      },
-    );
+        const userId = SpinalGraphService.createNode(user, undefined);
+        user.id = userId;
+
+        return SpinalGraphService.addChildInContext(
+          this.contextId,
+          userId,
+          this.contextId,
+          RELATION_NAME,
+          RELATION_TYPE,
+        ).then(() => {
+          return Promise.resolve(user);
+        });
+      })
+      .catch(
+        (e) => {
+          return Promise.resolve(e);
+        },
+      );
+    // @ts-ignore
+
   }
 
-  private findUser(userId: number): Promise<UserInterface> {
-    return SpinalGraphService.getChild(this.contextId, [RELATION_NAME])
+  public getUser(url: string, email: string, password: string):
+    Promise<UserInterface> {
+    // @ts-ignore
+    return this.findUserWithEmailPassword(email, password);
+  }
+
+  public addNode(userId: string, childId: string, relationName: string, relationType: string) {
+    return SpinalGraphService.addChild(userId, childId, relationName, relationType);
+  }
+
+  private findEmail(email: string): Promise<boolean> {
+    return SpinalGraphService.getChildren(this.contextId, [RELATION_NAME])
       .then((children) => {
         if (children.length < 0) {
-          return Promise.reject(USER_NOT_FOUND);
+          return Promise.resolve(false);
         }
         for (let i = 0; i < children.length; i = i + 1) {
-          if (
-            children[i].hasOwnProperty('info')
-            && children[i].info.hasOwnProperty('userId')
-            && children[i].info.userId === userId
+          if (children[i].hasOwnProperty('email')
+            && children[i].email.get() === email
           ) {
-            return Promise.resolve(children[i].info);
+            return Promise.resolve(true);
           }
         }
-        return Promise.reject(USER_NOT_FOUND);
+        return Promise.resolve(false);
       });
   }
+
+  private findUserWithEmailPassword(email: string, password: string): Promise<UserInterface> {
+    return SpinalGraphService.getChildren(this.contextId, [RELATION_NAME])
+      .then((children) => {
+        if (children.length < 0) {
+          return Promise.reject(USER_BASE_EMPTY);
+        }
+
+        for (let i = 0; i < children.length; i = i + 1) {
+          if (children[i].hasOwnProperty('email')
+            && children[i].email.get() === email
+            && children[i].hasOwnProperty('password')
+            && children[i].password.get() === password
+          ) {
+
+            return Promise.resolve(children[i]);
+          }
+        }
+        return Promise.resolve(USER_NOT_FOUND);
+      }).catch(((e) => {
+        console.error(e);
+        return Promise.resolve(e);
+      }))
+      ;
+  }
+
 }

@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "SpinalCOM service user. This service allow the management of users inside a spinal environment.",
   "main": "dist/index.js",
-  "scripts": {
-
-  },
+  "scripts": {},
   "keywords": [],
   "author": "SPINALCOM",
   "license": "SPINALCOM",
@@ -20,8 +18,8 @@
     "@types/node": "^10.12.12"
   },
   "dependencies": {
-    "spinal-env-viewer-graph-service": "file:../spinal-env-viewer-graph-service",
-    "spinal-models-user": "git+https://github.com/spinalcom/spinal-models-user.git",
+    "spinal-env-viewer-graph-service": "file:../Spinal-Graph-Service",
+    "spinal-models-user": "file:../spinal-models-user",
     "spinal-core-connectorjs_type": "git+https://github.com/spinalcom/spinal-core-connectorjs_type.git"
   }
 }

@@ -27,3 +27,5 @@ export const CANNOT_CREATE_CONTEXT_INTERNAL_ERROR : string =
   `${ERROR_PREFIX}Internal error: cannot create context`;
 
 export const USER_NOT_FOUND : string = `${ERROR_PREFIX}USER NOT FOUND`;
+export const USER_BASE_EMPTY: string = `${ERROR_PREFIX}NO USER REGISTER`;
+export const USER_ALREADY_EXIST: string = `${ERROR_PREFIX}NO USER REGISTER`;
