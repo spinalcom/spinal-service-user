@@ -51,7 +51,6 @@ const spinal_env_viewer_graph_service_1 = require( "spinal-env-viewer-graph-serv
 const Constants_1 = require( "./Constants" );
 const Errors_1 = require( "./Errors" );
 const gRoot = typeof window === 'undefined' ? global : window;
-
 class ServiceUser {
   constructor() {
     this.initialized = false;
@@ -156,6 +155,5 @@ class ServiceUser {
       }) );
   }
 }
-
 exports.ServiceUser = ServiceUser;
 //# sourceMappingURL=ServiceUser.js.map
