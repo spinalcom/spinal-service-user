@@ -36,7 +36,6 @@ import {
 } from './Errors';
 import { UserInterface } from 'spinal-models-user/declarations/SpinalUser';
 
-const gRoot = typeof window === 'undefined' ? global : window;
 
 export class ServiceUser {
   public contextId: string;
@@ -71,8 +70,7 @@ export class ServiceUser {
         })
         .catch((e) => {
           console.error(e);
-        })
-      ;
+        });
     } else {
       this.createContext()
         .catch((e) => {
@@ -84,7 +82,7 @@ export class ServiceUser {
   public createUser(url: any, user: UserInterface): Promise<UserInterface | string> {
 
     return this.findEmail(user.email)
-      .then((exist) => {
+      .then((exist: boolean): any => {
         if (exist) {
           return Promise.resolve(USER_ALREADY_EXIST);
         }
@@ -110,10 +108,30 @@ export class ServiceUser {
 
   }
 
-  public getUser(url: string, email: string, password: string):
-    Promise<UserInterface> {
-    // @ts-ignore
-    return this.findUserWithEmailPassword(email, password);
+  public getUser(id: string): Promise<UserInterface>;
+  public getUser(url: string, email: string, password: string): Promise<UserInterface>;
+  public getUser(id: string, email?: string, password?: string): Promise<UserInterface> {
+    if (typeof email !== 'string' && typeof password !== 'string')
+      return this.findUserWithEmailPassword(email, password);
+    return SpinalGraphService.getChildren(this.contextId, [RELATION_NAME])
+      .then((children: any[]) => {
+        if (children.length < 0) {
+          return Promise.reject(USER_BASE_EMPTY);
+        }
+
+        for (let i = 0; i < children.length; i = i + 1) {
+          if (children[i].hasOwnProperty('id')
+            && children[i].id.get() === id
+          ) {
+
+            return Promise.resolve(children[i]);
+          }
+        }
+        return Promise.resolve(USER_NOT_FOUND);
+      }).catch(((e) => {
+        console.error(e);
+        return Promise.resolve(e);
+      }));
   }
 
   public addNode(userId: string, childId: string, relationName: string, relationType: string) {
@@ -139,7 +157,7 @@ export class ServiceUser {
 
   private findUserWithEmailPassword(email: string, password: string): Promise<UserInterface> {
     return SpinalGraphService.getChildren(this.contextId, [RELATION_NAME])
-      .then((children) => {
+      .then((children: any[]) => {
         if (children.length < 0) {
           return Promise.reject(USER_BASE_EMPTY);
         }

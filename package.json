@@ -1,6 +1,6 @@
 {
   "name": "spinal-service-user",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SpinalCOM service user. This service allow the management of users inside a spinal environment.",
   "main": "dist/index.js",
   "scripts": {},

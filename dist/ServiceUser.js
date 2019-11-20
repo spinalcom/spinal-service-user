@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const Constants_1 = require("./Constants");
 const Errors_1 = require("./Errors");
-const gRoot = typeof window === 'undefined' ? global : window;
 class ServiceUser {
     constructor() {
         this.initialized = false;
@@ -82,9 +81,25 @@ class ServiceUser {
         });
         // @ts-ignore
     }
-    getUser(url, email, password) {
-        // @ts-ignore
-        return this.findUserWithEmailPassword(email, password);
+    getUser(id, email, password) {
+        if (typeof email !== 'string' && typeof password !== 'string')
+            return this.findUserWithEmailPassword(email, password);
+        return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(this.contextId, [Constants_1.RELATION_NAME])
+            .then((children) => {
+            if (children.length < 0) {
+                return Promise.reject(Errors_1.USER_BASE_EMPTY);
+            }
+            for (let i = 0; i < children.length; i = i + 1) {
+                if (children[i].hasOwnProperty('id')
+                    && children[i].id.get() === id) {
+                    return Promise.resolve(children[i]);
+                }
+            }
+            return Promise.resolve(Errors_1.USER_NOT_FOUND);
+        }).catch(((e) => {
+            console.error(e);
+            return Promise.resolve(e);
+        }));
     }
     addNode(userId, childId, relationName, relationType) {
         return spinal_env_viewer_graph_service_1.SpinalGraphService.addChild(userId, childId, relationName, relationType);
