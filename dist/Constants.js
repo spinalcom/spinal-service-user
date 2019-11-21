@@ -28,4 +28,5 @@ exports.SERVICE_NAME = '.UserService';
 exports.SERVICE_TYPE = 'SpinalSystemServiceUser';
 exports.RELATION_NAME = 'hasUser';
 exports.RELATION_TYPE = spinal_env_viewer_graph_service_1.SPINAL_RELATION_TYPE;
+exports.DEFAULT_USER_RELATION_NAME = 'hasDefaultUser';
 //# sourceMappingURL=Constants.js.map

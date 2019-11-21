@@ -7,7 +7,9 @@ export declare class ServiceUser {
     private users;
     private createContext;
     init(): void;
-    createUser(url: any, user: UserInterface): Promise<UserInterface | string>;
+    createUser(url: any, user: UserInterface): Promise<UserInterface>;
+    createDefaultUser(url: any, user: UserInterface): Promise<UserInterface | string>;
+    getDefaultUser(): Promise<any>;
     getUser(id: string): Promise<UserInterface>;
     getUser(url: string, email: string, password: string): Promise<UserInterface>;
     addNode(userId: string, childId: string, relationName: string, relationType: string): Promise<boolean>;

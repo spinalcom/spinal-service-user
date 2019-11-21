@@ -27,3 +27,4 @@ export const SERVICE_NAME: string = '.UserService';
 export const SERVICE_TYPE: string = 'SpinalSystemServiceUser';
 export const RELATION_NAME: string = 'hasUser';
 export const RELATION_TYPE: string = SPINAL_RELATION_TYPE;
+export const DEFAULT_USER_RELATION_NAME: string = 'hasDefaultUser';

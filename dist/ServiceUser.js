@@ -82,6 +82,29 @@ class ServiceUser {
         });
         // @ts-ignore
     }
+    createDefaultUser(url, user) {
+        return this.findEmail(user.email)
+            .then((exist) => {
+            if (exist) {
+                return Promise.resolve(Errors_1.USER_ALREADY_EXIST);
+            }
+            const userId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(user, undefined);
+            user.id = userId;
+            return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(this.contextId, userId, this.contextId, Constants_1.RELATION_NAME, Constants_1.RELATION_TYPE).then(() => {
+                return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(this.contextId, userId, this.contextId, Constants_1.DEFAULT_USER_RELATION_NAME, Constants_1.RELATION_TYPE);
+            }).then(() => {
+                return Promise.resolve(user);
+            });
+        })
+            .catch((e) => {
+            return Promise.resolve(e);
+        });
+    }
+    getDefaultUser() {
+        return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(this.contextId, [Constants_1.DEFAULT_USER_RELATION_NAME]).then((lst) => {
+            return lst[0];
+        });
+    }
     getUser(id, email, password) {
         if (typeof email === 'string' && typeof password === 'string')
             return this.findUserWithEmailPassword(email, password);

@@ -27,6 +27,7 @@ import {
   RELATION_TYPE,
   SERVICE_NAME,
   SERVICE_TYPE,
+  DEFAULT_USER_RELATION_NAME,
 } from './Constants';
 import {
   CANNOT_CREATE_CONTEXT_INTERNAL_ERROR,
@@ -79,7 +80,7 @@ export class ServiceUser {
     }
   }
 
-  public createUser(url: any, user: UserInterface): Promise<UserInterface | string> {
+  public createUser(url: any, user: UserInterface): Promise<UserInterface> {
 
     return this.findEmail(user.email)
       .then((exist: boolean): any => {
@@ -106,6 +107,47 @@ export class ServiceUser {
       );
     // @ts-ignore
 
+  }
+
+  public createDefaultUser(url: any, user: UserInterface): Promise<UserInterface | string> {
+    return this.findEmail(user.email)
+      .then((exist: boolean): any => {
+        if (exist) {
+          return Promise.resolve(USER_ALREADY_EXIST);
+        }
+        const userId = SpinalGraphService.createNode(user, undefined);
+        user.id = userId;
+        return SpinalGraphService.addChildInContext(
+          this.contextId,
+          userId,
+          this.contextId,
+          RELATION_NAME,
+          RELATION_TYPE,
+        ).then(() => {
+          return SpinalGraphService.addChildInContext(
+            this.contextId,
+            userId,
+            this.contextId,
+            DEFAULT_USER_RELATION_NAME,
+            RELATION_TYPE,
+          )
+        }).then(() => {
+          return Promise.resolve(user);
+        });
+      })
+      .catch(
+        (e) => {
+          return Promise.resolve(e);
+        },
+      );
+  }
+  public getDefaultUser(): Promise<any> {
+    return SpinalGraphService.getChildren(
+      this.contextId,
+      [DEFAULT_USER_RELATION_NAME]
+    ).then((lst) => {
+      return lst[0]
+    })
   }
 
   public getUser(id: string): Promise<UserInterface>;
