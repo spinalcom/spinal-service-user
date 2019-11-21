@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const Constants_1 = require("./Constants");
 const Errors_1 = require("./Errors");
+require("spinal-core-connectorjs_type");
 class ServiceUser {
     constructor() {
         this.initialized = false;
@@ -82,7 +83,7 @@ class ServiceUser {
         // @ts-ignore
     }
     getUser(id, email, password) {
-        if (typeof email !== 'string' && typeof password !== 'string')
+        if (typeof email === 'string' && typeof password === 'string')
             return this.findUserWithEmailPassword(email, password);
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(this.contextId, [Constants_1.RELATION_NAME])
             .then((children) => {

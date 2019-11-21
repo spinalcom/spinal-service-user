@@ -35,7 +35,7 @@ import {
   USER_NOT_FOUND,
 } from './Errors';
 import { UserInterface } from 'spinal-models-user/declarations/SpinalUser';
-
+import 'spinal-core-connectorjs_type';
 
 export class ServiceUser {
   public contextId: string;
@@ -111,7 +111,7 @@ export class ServiceUser {
   public getUser(id: string): Promise<UserInterface>;
   public getUser(url: string, email: string, password: string): Promise<UserInterface>;
   public getUser(id: string, email?: string, password?: string): Promise<UserInterface> {
-    if (typeof email !== 'string' && typeof password !== 'string')
+    if (typeof email === 'string' && typeof password === 'string')
       return this.findUserWithEmailPassword(email, password);
     return SpinalGraphService.getChildren(this.contextId, [RELATION_NAME])
       .then((children: any[]) => {

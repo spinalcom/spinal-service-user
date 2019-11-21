@@ -1,4 +1,5 @@
 import { UserInterface } from 'spinal-models-user/declarations/SpinalUser';
+import 'spinal-core-connectorjs_type';
 export declare class ServiceUser {
     contextId: string;
     private context;
